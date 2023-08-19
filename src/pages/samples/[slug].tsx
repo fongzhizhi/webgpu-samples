@@ -35,6 +35,7 @@ export const samplePages = {
 
 export const myPages = {
   redTriangle: dynamic(() => import('../../my-sample/01-red-triangle/index')),
+  rgbTriangle: dynamic(() => import('../../my-sample/02-rgb-triangle/index')),
 };
 
 const useSample = false;
