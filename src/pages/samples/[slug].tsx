@@ -9,7 +9,7 @@ type Props = {
   slug: string;
 };
 
-export const pages = {
+export const samplePages = {
   helloTriangle: dynamic(() => import('../../sample/helloTriangle/main')),
   helloTriangleMSAA: dynamic(
     () => import('../../sample/helloTriangleMSAA/main')
@@ -32,6 +32,13 @@ export const pages = {
   ),
   particles: dynamic(() => import('../../sample/particles/main')),
 };
+
+export const myPages = {
+  redTriangle: dynamic(() => import('../../my-sample/01-red-triangle/index')),
+};
+
+const useSample = false;
+export const pages = useSample ? samplePages : myPages;
 
 function Page({ slug }: Props): JSX.Element {
   const PageComponent = pages[slug];

@@ -1,13 +1,29 @@
 import { makeSample, SampleInit } from '../../components/SampleLayout';
+import wgslCode from './redTriangle.wgsl';
 
-import triangleVertWGSL from '../../shaders/triangle.vert.wgsl';
-import redFragWGSL from '../../shaders/red.frag.wgsl';
+/**实例渲染器 */
+const SampleRender: () => JSX.Element = () =>
+  makeSample({
+    name: 'A red triangles',
+    description: '',
+    init,
+    sources: [
+      {
+        name: __filename.substring(__dirname.length + 1),
+        contents: __SOURCE__,
+      },
+      {
+        name: './redTriangle.wgsl',
+        contents: wgslCode,
+        editable: true,
+      },
+    ],
+    filename: __filename,
+});
 
 const init: SampleInit = async ({ canvas, pageState }) => {
-  // [init]
+  // [init] 界面状态、创建适配器和设备,并与绘图上下文关联
   if (!pageState.active) return;
-
-  // [data]
   /**webgpu上下文 */
   const context = canvas.getContext('webgpu') as GPUCanvasContext;
   /**适配器 */
@@ -22,22 +38,25 @@ const init: SampleInit = async ({ canvas, pageState }) => {
     format: presentationFormat,
     alphaMode: 'opaque',
   });
+
+  // [pipeline] 创建渲染管道
   /**渲染管道 */
   const pipeline = device.createRenderPipeline({
     layout: 'auto',
     /**顶点着色器 */
     vertex: {
       module: device.createShaderModule({
-        code: triangleVertWGSL,
+        code: wgslCode,
       }),
-      entryPoint: 'main',
+      entryPoint: 'vs',
     },
     /**片段着色器 */
     fragment: {
       module: device.createShaderModule({
-        code: redFragWGSL,
+        code: wgslCode,
       }),
-      entryPoint: 'main',
+      entryPoint: 'fs',
+      /**目标纹理 */
       targets: [
         {
           format: presentationFormat,
@@ -47,7 +66,7 @@ const init: SampleInit = async ({ canvas, pageState }) => {
     /**原始状态 */
     primitive: {
       /**拓扑结构 */
-      topology: 'triangle-list',
+      topology: 'triangle-list',  // 三角形列表
     },
   });
 
@@ -58,8 +77,6 @@ const init: SampleInit = async ({ canvas, pageState }) => {
   function render() {
     // [init]
     if (!pageState.active) return;
-
-    // [data]
     /**命令编码器 */
     const commandEncoder = device.createCommandEncoder();
     /**纹理预览器 */
@@ -89,28 +106,4 @@ const init: SampleInit = async ({ canvas, pageState }) => {
   }
 };
 
-const HelloTriangle: () => JSX.Element = () =>
-  makeSample({
-    name: 'Hello Triangle',
-    description: 'Shows rendering a basic triangle.',
-    init,
-    sources: [
-      {
-        name: __filename.substring(__dirname.length + 1),
-        contents: __SOURCE__,
-      },
-      {
-        name: '../../shaders/triangle.vert.wgsl',
-        contents: triangleVertWGSL,
-        editable: true,
-      },
-      {
-        name: '../../shaders/red.frag.wgsl',
-        contents: redFragWGSL,
-        editable: true,
-      },
-    ],
-    filename: __filename,
-});
-
-export default HelloTriangle;
+export default SampleRender;
